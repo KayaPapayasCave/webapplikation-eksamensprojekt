@@ -1,0 +1,31 @@
+* {
+  margin: 0;
+  font-family: 'Segoe UI', Roboto, sans-serif;
+}
+
+html {
+  position: relative; /* Important! Makes sure that the footer works */
+  min-height: 100%; /* Important! Makes sure that the footer works */
+  padding-bottom: 160px; /* Important! Makes sure that the footer does not overlap with content on the page (should be the same height as the footer) */
+}
+
+.default-page-setup {
+    background-color: #FEF5E7;
+    min-height: 100vh; /* Makes the background fill the entire screen height */
+    padding: 3rem;
+}
+
+.site-title {
+    text-align: center;
+}
+
+.image-container {
+    margin: auto;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+.image {
+    width: 400px;
+    height: auto;
+}

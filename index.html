@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Stress- og Fokusmonitor for studerende</title>
+    <!-- Import Styles -->
+    <link rel="stylesheet" href="./assets/css/styles.css" />
+    <link rel="stylesheet" href="./assets/css/stylesNavbar.css" />
+    <link rel="stylesheet" href="./assets/css/stylesFooter.css" />
+    <!-- Import Vue.js & Axios -->
+    <script src="https://unpkg.com/vue@3.0.11/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/axios@1.6.7/dist/axios.min.js"></script>
+    <!-- Import Vue Router -->
+    <script src="https://unpkg.com/vue-router@4/dist/vue-router.global.js"></script>
+    <!-- Load an icon library to show a hamburger menu (bars) on small screens -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <!-- Favicon -->
+    <link rel="icon" href="https://vuejs.org/images/logo.png" />
+  </head>
+  <body>
+    <div id="app">
+
+      <div class="topnav" id="myTopnav">
+        <router-link :to="{ name: 'home' }" class="active">Home</router-link>
+        <router-link :to="{ name: 'other' }">Other</router-link>
+        <!-- <a href="javascript:void(0);" class="icon" @click="toggleResponsiveNav">
+          <i class="fa fa-bars"></i>
+        </a> -->
+      </div>
+
+      <div class="page-container">
+        <router-view></router-view>
+      </div>
+
+      <div class="footer">
+        <p>
+          Stress- og Fokusmonitor for studerende {{ currentYear }}. All Rights Reserved.
+        </p>
+      </div>
+    </div>
+
+    <!-- Import Components -->
+
+    <!-- Load the Pages -->
+    <script src="./pages/HomePage.js"></script>
+    <script src="./pages/OtherPage.js"></script>
+
+    <!-- Import App -->
+    <script src="./main.js"></script>
+  </body>
+</html>

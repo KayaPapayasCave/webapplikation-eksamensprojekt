@@ -38,10 +38,19 @@ const HomePage = {
 
             <h3>Data for luftfugtighed:</h3>
             <p>Kommer snart :-)</p>
+
+            <br>
+            <br>
+
+            <div class="image-container">
+                <img v-bind:src="image" class="image">
+            </div>
         </div>
     `,
     data() {
         return {
+            image: './assets/images/stress- og fokusmonitor for studerende.png',
+
             noisesList: [],
             error: null, 
             statuscode: null,

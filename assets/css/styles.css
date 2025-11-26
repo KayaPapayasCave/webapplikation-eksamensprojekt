@@ -19,6 +19,7 @@ html {
     text-align: center;
 }
 
+/* Makes the super cool image centered on the page (FOR TESTING !!!) */
 .image-container {
     margin: auto;
     justify-content: center;
@@ -28,4 +29,90 @@ html {
 .image {
     width: 400px;
     height: auto;
+}
+
+/* Makes the 4 cards with current room data into a row */
+.current-data-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 2rem;
+}
+/* Makes the 2 cards with graphic overviews into a row */
+.graphics-data-container {
+  display: grid;
+  grid-template-columns: 2fr 1fr; /* 70%-30% ratio */
+  gap: 2rem;
+}
+
+/* Gives each cards a background color, round corners, and some shadows */
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+
+/* The text fields inside the cards */
+.label {
+  font-size: 14px;
+  color: #555;
+}
+.value {
+  font-size: 22px;
+  font-weight: bold;
+}
+.sub {
+  font-size: 12px;
+  color: #777;
+}
+.title {
+  font-size: 18px;
+}
+
+
+
+/* Styling for the table */
+.card table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 15px;
+}
+
+/* The table titles & the thick line */
+.card thead th {
+  text-align: left;
+  padding: 12px 0;
+  border-bottom: 2px solid #e5e5e5;
+}
+
+/* The row seperator lines */
+.card tbody tr {
+  border-bottom: 1px solid #f1f1f1;
+}
+
+/* .card tbody tr:nth-child(even) {
+  background-color: #fafafa; /* let zebra *//*
+} */
+
+/* The table text, spacing around the text & text-color */
+.card tbody td {
+  text-align: left;
+  padding: 14px 0;
+  color: #333;
+}
+
+/* Makes the last two columns look like links */
+.card tbody td:last-child,
+.card tbody td:nth-last-child(2) {
+    /*color: #0066cc;        /* blå links */
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+/* Controls the title of the table */
+.card .title {
+    text-align: left;
+    margin-bottom: 20px;
 }

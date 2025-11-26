@@ -14,7 +14,10 @@ const HomePage = {
 
             <ul v-if="noisesList.length">
                 <li v-for="noise in noisesList" :key="noise.id">
-                    Noise {{noise.id}} {{noise.decibel}}
+                    Indhentet Noise [Id: {{noise.id}}], 
+                    [Decibel: {{noise.decibel}}], 
+                    [Dato: {{ new Date(noise.time).toLocaleDateString() }}], 
+                    [Tidspunkt: {{ new Date(noise.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }}]
                 </li>
             </ul>
 
@@ -46,22 +49,22 @@ const HomePage = {
     },
     // created() is called automatically when the page is loaded.
     async created() {
-      console.log("created method called");
-      //await this.getAllNoises();
+        console.log("created method called");
+        await this.getAllNoises();
     },
     methods: {
-        // async getAllNoises() {
-        //   this.error = null;
+        async getAllNoises() {
+            this.error = null;
 
-        //   await axios.get(baseUri)
-        //   .then(response => {
-        //       this.noisesList = response.data;
-        //       this.statuscode = response.status;
-        //   })
-        //   .catch(error => {
-        //       this.noisesList = [];
-        //       this.error = error.message;
-        //   })  
-        // }
+            await axios.get(baseUri)
+            .then(response => {
+                this.noisesList = response.data;
+                this.statuscode = response.status;
+            })
+            .catch(error => {
+                this.noisesList = [];
+                this.error = error.message;
+            })  
+        }
     }
 }

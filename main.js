@@ -1,4 +1,4 @@
-const baseUri = "https://localhost:????/api/????"
+const baseUri = "https://localhost:7080/api/Noise"
 
 const routes = [
     { name: 'home', path: '/', component: HomePage },

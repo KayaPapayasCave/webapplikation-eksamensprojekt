@@ -35,6 +35,14 @@ const OtherPage = {
                 <h2 class="title">Oversigt over målinger</h2>
                 <br> <br> 
                 <img v-bind:src="imgLineGraph">
+                <!-- <line-chart 
+                    v-if="chartLabels.length"
+                    :labels="chartLabels"
+                    :noise="chartNoiseData"
+                    :humidity="chartHumidityData"
+                    :temperature="chartTemperatureData"
+                    :light="chartLightData">
+                </line-chart> -->
                 <br> <br>
             </div>
             <div class="card">
@@ -77,6 +85,9 @@ const OtherPage = {
     </div>
     `,
     name: "DashboardPage",
+    components: {
+        'line-chart': LineChartComponent
+    },
     data() {
         return {
             imgLineGraph: './assets/images/LineGraph.png',
@@ -113,7 +124,7 @@ const OtherPage = {
     async created() {
         console.log("created method called");
 
-        // Run all API calls in parallel
+        // Run all API calls in parallel.
         await Promise.all([
             this.getAllNoises(),
             this.getAllHumidities(),
@@ -121,12 +132,13 @@ const OtherPage = {
             this.getAllLights()
         ]);
 
+        // Sort all the lists and get the latest measurement for each type.
         this.getLatestNoise();
         this.getLatestHumidity();
         this.getLatestTemperature();
         this.getLatestLight();
 
-        // Sort latest measurements by time (newest first)
+        // Sort latest measurements list by time (newest first)
         this.latestMeasurements.sort((a, b) => new Date(b.time) - new Date(a.time));
     },
     methods: {
@@ -214,7 +226,7 @@ const OtherPage = {
         getLatestNoise() {
             if (!this.noisesList.length) return;
 
-            const copy = this.noisesList.slice();   // Make a copy of the array
+            const copy = this.noisesList.slice();   // Make a copy of the array to sort
             copy.sort((a, b) => new Date(b.time) - new Date(a.time));
 
             this.latestNoise = copy[0];
@@ -222,15 +234,15 @@ const OtherPage = {
         getLatestHumidity() {
             if (!this.humiditiesList.length) return;
 
-            const copy = this.humiditiesList.slice();   // Make a copy of the array
+            const copy = this.humiditiesList.slice();   // Make a copy of the array to sort
             copy.sort((a, b) => new Date(b.time) - new Date(a.time));
 
             this.latestHumidity = copy[0];
         },
         getLatestTemperature() {
             if (!this.temperaturesList.length) return;
-
-            const copy = this.temperaturesList.slice();   // Make a copy of the array
+ 
+            const copy = this.temperaturesList.slice();   // Make a copy of the array to sort
             copy.sort((a, b) => new Date(b.time) - new Date(a.time));
 
             this.latestTemperature = copy[0];
@@ -238,10 +250,29 @@ const OtherPage = {
         getLatestLight() {
             if (!this.lightsList.length) return;
 
-            const copy = this.lightsList.slice();   // Make a copy of the array
+            const copy = this.lightsList.slice();   // Make a copy of the array to sort
             copy.sort((a, b) => new Date(b.time) - new Date(a.time));
 
             this.latestLight = copy[0];
+        }
+    },
+    computed: {
+        chartLabels() {
+            return this.noisesList.map(x =>
+                new Date(x.time).toLocaleDateString('da-DK')
+            );
+        },
+        chartNoiseData() {
+            return this.noisesList.map(x => x.decibel);
+        },
+        chartHumidityData() {
+            return this.humiditiesList.map(x => x.humidityPercent);
+        },
+        chartTemperatureData() {
+            return this.temperaturesList.map(x => x.celsius);
+        },
+        chartLightData() {
+            return this.lightsList.map(x => x.lumen);
         }
     }
 }

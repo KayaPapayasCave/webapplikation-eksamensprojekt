@@ -2,10 +2,12 @@ const baseUriNoise = "https://localhost:7080/api/Noise"
 const baseUriHumidity = "https://localhost:7080/api/Humidity"
 const baseUriTemperature = "https://localhost:7080/api/Temperature"
 const baseUriLight = "https://localhost:7080/api/Light"
+const apiUri = "https://localhost:7080/api/Light"
 
 const routes = [
     { name: 'home', path: '/', component: HomePage },
     { name: 'other', path: '/', component: OtherPage },
+    { name: 'api', path: '/', component: APIPage },
 ]
 
 // Make the router work:

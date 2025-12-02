@@ -24,8 +24,8 @@
 
       <div class="topnav" id="myTopnav">
         <router-link :to="{ name: 'home' }" class="active">Home</router-link>
-        <router-link :to="{ name: 'other' }">Other</router-link>
-        <router-link :to="{ name: 'api' }">API</router-link>
+        <router-link :to="{ name: 'test' }">Axios Test</router-link>
+        <router-link :to="{ name: 'api' }">API Test</router-link>
         <!-- <a href="javascript:void(0);" class="icon" @click="toggleResponsiveNav">
           <i class="fa fa-bars"></i>
         </a> -->
@@ -43,11 +43,14 @@
     </div>
 
     <!-- Import Components -->
+    <script src="./components/MeasurementCardComponent.js"></script>
     <script src="./components/LineChartComponent.js"></script>
+    <script src="./components/DoughnutChartComponent.js"></script>
+    <script src="./components/MeasurementsTableComponent.js"></script>
 
     <!-- Load the Pages -->
+    <script src="./pages/TestPage.js"></script>
     <script src="./pages/HomePage.js"></script>
-    <script src="./pages/OtherPage.js"></script>
     <script src="./pages/APIPage.js"></script>
 
     <!-- Import App -->

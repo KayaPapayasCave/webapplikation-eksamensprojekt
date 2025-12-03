@@ -92,10 +92,6 @@ html {
   border-bottom: 1px solid #f1f1f1;
 }
 
-/* .card tbody tr:nth-child(even) {
-  background-color: #fafafa; /* let zebra *//*
-} */
-
 /* The table text, spacing around the text & text-color */
 .card tbody td {
   text-align: left;
@@ -104,12 +100,11 @@ html {
 }
 
 /* Makes the last two columns look like links */
-.card tbody td:last-child,
+/* .card tbody td:last-child,
 .card tbody td:nth-last-child(2) {
-    /*color: #0066cc;        /* blå links */
     cursor: pointer;
     text-decoration: underline;
-}
+} */
 
 /* Controls the title of the table */
 .card .title {

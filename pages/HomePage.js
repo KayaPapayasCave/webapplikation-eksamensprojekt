@@ -2,7 +2,7 @@ const HomePage = {
     components: {
         'measurement-card-component': MeasurementCardComponent,
         'line-chart': LineChartComponent,
-        'doughnut-chart': DoughnutChartComponent,
+        'donut-chart': DonutChartComponent,
         'measurements-table': MeasurementsTableComponent
     },
     template: /*html*/`
@@ -22,31 +22,44 @@ const HomePage = {
         <div class="graphics-data-container">
             <div class="card">
                 <h2 class="title">Oversigt over målinger</h2>
-                <br> <br> 
-                <img v-bind:src="imgLineGraph">
-                <!-- <line-chart 
+                <br>
+                <!--<img v-bind:src="imgLineGraph">-->
+
+                <line-chart
                     v-if="chartLabels.length"
+                    style="width: 800px; height: 300px; margin: auto;"
                     :labels="chartLabels"
                     :noise="chartNoiseData"
                     :humidity="chartHumidityData"
                     :temperature="chartTemperatureData"
                     :light="chartLightData"
-                /> -->
-                <br> <br>
+                ></line-chart>
+
+                <br>
+
+                <div class="period-selector">
+                    <button v-for="opt in periodOptions"
+                            :key="opt.value"
+                            :class="{ active: selectedPeriod === opt.value }"
+                            @click="selectedPeriod = opt.value">
+                        {{ opt.label }}
+                    </button>
+                </div>
+
+                <br>
             </div>
             <div class="card">
                 <h2 class="title">Dominerende målinger</h2>
-                <br> <br>
-                <img v-bind:src="imgPieChart">
-                <!-- <doughnut-chart 
-                    v-if="chartLabels.length"
-                    :labels="chartLabels"
-                    :noise="chartNoiseData"
-                    :humidity="chartHumidityData"
-                    :temperature="chartTemperatureData"
-                    :light="chartLightData"
-                /> -->
-                <br> <br>
+                <br>
+                <!--<img v-bind:src="imgPieChart">-->
+                <donut-chart
+                    style="margin: auto;"
+                    :noise="latestNoise ? latestNoise.decibel : null"
+                    :humidity="latestHumidity ? latestHumidity.humidityPercent : null"
+                    :temperature="latestTemperature ? latestTemperature.celsius : null"
+                    :light="latestLight ? latestLight.lumen : null"
+                ></donut-chart>
+                <br>
             </div>
         </div>
 
@@ -58,6 +71,13 @@ const HomePage = {
     name: "DashboardPage",
     data() {
         return {
+            selectedPeriod: '24h',
+            periodOptions: [
+                { label: '1 døgn', value: '24h' },
+                { label: '1 uge', value: '7d' },
+                { label: '1 måned', value: '30d' }
+            ],
+
             measurementCards: [
                 { label: "Støjniveau", key: "latestNoise", field: "decibel", unit: "dB" },
                 { label: "Luftfugtighed", key: "latestHumidity", field: "humidityPercent", unit: "%" },
@@ -96,10 +116,10 @@ const HomePage = {
 
         // Run all API calls in parallel.
         await Promise.all([
-            this.getAll(baseUriNoise, 'noisesList', 'Støjniveau', 'errorNoise', 'statuscodeNoise'),
-            this.getAll(baseUriHumidity, 'humiditiesList', 'Fugtighed', 'errorHumidities', 'statuscodeHumidities'),
-            this.getAll(baseUriTemperature, 'temperaturesList', 'Temperatur', 'errorTemperature', 'statuscodeTemperature'),
-            this.getAll(baseUriLight, 'lightsList', 'Lysstyrke', 'errorLight', 'statuscodeLight'),
+            this.getAll(baseUriNoise, 'noisesList', 'Støjniveau', 'errorNoise', 'statuscodeNoise', 'decibel'),
+            this.getAll(baseUriHumidity, 'humiditiesList', 'Fugtighed', 'errorHumidities', 'statuscodeHumidities', 'humidityPercent'),
+            this.getAll(baseUriTemperature, 'temperaturesList', 'Temperatur', 'errorTemperature', 'statuscodeTemperature', 'celsius'),
+            this.getAll(baseUriLight, 'lightsList', 'Lysstyrke', 'errorLight', 'statuscodeLight', 'lumen'),
         ]);
 
         // Sort all the lists and get the latest measurement for each type.
@@ -112,10 +132,10 @@ const HomePage = {
         this.latestMeasurements.sort((a, b) => new Date(b.time) - new Date(a.time));
     },
     methods: {
-        addRow(name, time, room, city, missed) { // Adds a row to the latest measurements table.
-            this.latestMeasurements.push({ name: name, time: time, room: room, city: city, missed: missed });
+        addRow(name, time, room, city, measurement, missed) { // Adds a row to the latest measurements table.
+            this.latestMeasurements.push({ name: name, time: time, room: room, city: city, measurement: measurement, missed: missed });
         },
-        async getAll(url, listKey, rowName, errorKey, statuscodeKey) { // Generic method to get all data from a given URL and store it in the specified list.
+        async getAll(url, listKey, rowName, errorKey, statuscodeKey, measurementType) { // Generic method to get all data from a given URL and store it in the specified list.
             this[errorKey] = null;
 
             await axios.get(url)
@@ -123,8 +143,8 @@ const HomePage = {
                 this[listKey] = response.data;
                 this[statuscodeKey] = response.status;
 
-                this[listKey].forEach(light => {
-                    this.addRow(rowName, new Date(light.time), 'R.D3.11', 'Roskilde', 'Nej');
+                this[listKey].forEach(element => {
+                    this.addRow(rowName, new Date(element.time), 'R.D3.11', 'Roskilde', element[measurementType], 'Nej');
                 });
             })
             .catch(error => {
@@ -140,25 +160,29 @@ const HomePage = {
             const sorted = copy.sort((a, b) => new Date(b.time) - new Date(a.time));
             this[outputKey] = sorted[0];
         },
+        filterByPeriod(list) {
+            const now = new Date();
+            let cutoff;
+            switch(this.selectedPeriod) {
+                case '24h': cutoff = new Date(now.getTime() - 24*60*60*1000); break;
+                case '7d': cutoff = new Date(now.getTime() - 7*24*60*60*1000); break;
+                case '30d': cutoff = new Date(now.getTime() - 30*24*60*60*1000); break;
+                default: return list;
+            }
+            return list.filter(item => new Date(item.time) >= cutoff);
+        }
     },
     computed: {
         // Data for the line chart
-        chartLabels() {
-            return this.noisesList.map(x =>
-                new Date(x.time).toLocaleDateString('da-DK')
-            );
-        },
-        chartNoiseData() {
-            return this.noisesList.map(x => x.decibel);
-        },
-        chartHumidityData() {
-            return this.humiditiesList.map(x => x.humidityPercent);
-        },
-        chartTemperatureData() {
-            return this.temperaturesList.map(x => x.celsius);
-        },
-        chartLightData() {
-            return this.lightsList.map(x => x.lumen);
-        }
+        filteredNoisesList() { return this.filterByPeriod(this.noisesList); },
+        filteredHumiditiesList() { return this.filterByPeriod(this.humiditiesList); },
+        filteredTemperaturesList() { return this.filterByPeriod(this.temperaturesList); },
+        filteredLightsList() { return this.filterByPeriod(this.lightsList); },
+
+        chartLabels() { return this.filteredNoisesList.map(x => new Date(x.time).toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' })); },
+        chartNoiseData() { return this.filteredNoisesList.map(x => x.decibel); },
+        chartHumidityData() { return this.filteredHumiditiesList.map(x => x.humidityPercent); },
+        chartTemperatureData() { return this.filteredTemperaturesList.map(x => x.celsius); },
+        chartLightData() { return this.filteredLightsList.map(x => x.lumen); }
     }
 }

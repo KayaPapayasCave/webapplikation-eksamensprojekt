@@ -5,8 +5,8 @@ const baseUriLight = "https://localhost:7080/api/Light"
 const apiUri = "https://localhost:7080/api/Light"
 
 const routes = [
-    { name: 'test', path: '/', component: TestPage },
     { name: 'home', path: '/', component: HomePage },
+    { name: 'test', path: '/', component: TestPage },
     { name: 'api', path: '/', component: APIPage },
 ]
 

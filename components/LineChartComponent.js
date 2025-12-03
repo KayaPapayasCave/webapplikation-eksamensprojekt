@@ -1,151 +1,121 @@
 const LineChartComponent = {
     props: ["labels", "noise", "humidity", "temperature", "light"],
     template: /*html*/`
-        <div style="height:300px;" v-if="hasData">
-            <canvas :id="elementId"></canvas>
-        </div>
-        <div v-else>
-            <p>Indlæser data...</p>
-        </div>
+        <canvas ref="canvas"></canvas>
     `,
     data() {
         return {
-            elementId: "lineChart_" + Math.random().toString(36).substr(2, 9),
             chart: null
         }
     },
     mounted() {
-        this.initChart();
-    },
-    computed: {
-        hasData() {
-            // Tjekker om mindst én af datasættene har data
-            return (
-                this.labels.length > 0 &&
-                (this.noise.length > 0 ||
-                 this.humidity.length > 0 ||
-                 this.temperature.length > 0 ||
-                 this.light.length > 0)
-            );
-        }
-    },
-    // Watch listens for changes in props and updates the chart accordingly.
-    watch: {
-        labels: "updateChart",
-        noise: "updateChart",
-        humidity: "updateChart",
-        temperature: "updateChart",
-        light: "updateChart"
-    },
-    methods: {
-        initChart() {
-            const ctx = document.getElementById(this.elementId);
-            if (!ctx) {
-                console.error("Canvas not found:", this.elementId);
-                return;
+
+        const Utils = {
+            CHART_COLORS: {
+                noise: 'rgb(255, 99, 132)',
+                humidity: 'rgb(255, 159, 64)',
+                temperature: 'rgb(255, 205, 86)',
+                light: 'rgb(75, 192, 192)',
             }
+        };
 
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: this.labels,
-                    datasets: [
-                        {
-                            label: 'Støjniveau',
-                            data: this.noise,
-                            borderColor: '#000',         // sort
-                            backgroundColor: 'transparent',
-                            borderWidth: 2,
-                            tension: 0.5,
-                            pointRadius: 4,
-                            pointBackgroundColor: '#000'
-                        },
-                        {
-                            label: 'Luftfugtighed',
-                            data: this.humidity,
-                            borderColor: '#555',         // mørk grå
-                            backgroundColor: 'transparent',
-                            borderWidth: 2,
-                            tension: 0.5,
-                            pointRadius: 4,
-                            pointBackgroundColor: '#555'
-                        },
-                        {
-                            label: 'Temperatur',
-                            data: this.temperature,
-                            borderColor: '#aaa',         // mellem grå
-                            backgroundColor: 'transparent',
-                            borderWidth: 2,
-                            tension: 0.5,
-                            pointRadius: 4,
-                            pointBackgroundColor: '#aaa'
-                        },
-                        {
-                            label: 'Lysstyrke',
-                            data: this.light,
-                            borderColor: '#ddd',         // lys grå
-                            backgroundColor: 'transparent',
-                            borderWidth: 2,
-                            tension: 0.5,
-                            pointRadius: 4,
-                            pointBackgroundColor: '#ddd'
-                        }
-                    ]
+        // ---- X-aksen: 24 timer ----
+        const hours = Array.from({ length: 24 }, (_, i) => i + ":00");
+
+        // ---- Test Data over 24 timer -----
+        const noiseValues = Array.from({length:24}, (_,i) => i * 2);       // 0,2,4,...  
+        const humidityValues = Array.from({length:24}, (_,i) => 50);       // konstant 50  
+        const temperatureValues = Array.from({length:24}, (_,i) => 20+i);  // 20,21,...  
+        const lightValues = Array.from({length:24}, (_,i) => 80-i);        // 80,79,...  
+
+        const data = {
+            labels: this.labels, // array med tidspunkter
+            datasets: [
+                {
+                    label: 'Støjniveau',
+                    data: this.noise,
+                    borderColor: Utils.CHART_COLORS.noise,
+                    backgroundColor: Utils.CHART_COLORS.noise,
+                    fill: false,
+                    tension: 0.4
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
+                {
+                    label: 'Luftfugtighed',
+                    data: this.humidity,
+                    borderColor: Utils.CHART_COLORS.humidity,
+                    backgroundColor: Utils.CHART_COLORS.humidity,
+                    fill: false,
+                    tension: 0.4
+                },
+                {
+                    label: 'Temperatur',
+                    data: this.temperature,
+                    borderColor: Utils.CHART_COLORS.temperature,
+                    backgroundColor: Utils.CHART_COLORS.temperature,
+                    fill: false,
+                    tension: 0.4
+                },
+                {
+                    label: 'Lysstyrke',
+                    data: this.light,
+                    borderColor: Utils.CHART_COLORS.light,
+                    backgroundColor: Utils.CHART_COLORS.light,
+                    fill: false,
+                    tension: 0.4
+                }
+            ]
+        };
 
-                    plugins: {
-                        legend: {
-                            labels: {
-                                color: '#444',
-                                font: { size: 13 },
-                                usePointStyle: true,      // prik i stedet for firkant
-                                pointStyle: 'circle'
-                            }
+        const config = {
+            type: 'line',
+            data: data,
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',       // Labels over grafen
+                        labels: {
+                            boxWidth: 20,      // Kortere farvebokse
+                            padding: 10
                         }
                     },
-
-                    scales: {
-                        x: {
-                            grid: {
-                                display: false           // ingen grid på x-aksen
-                            },
-                            ticks: {
-                                color: '#666',
-                                font: { size: 12 }
-                            }
-                        },
-                        y: {
-                            grid: {
-                                color: 'rgba(0,0,0,0.025)' // meget svage linjer
-                            },
-                            ticks: {
-                                color: '#666',
-                                font: { size: 12 }
+                    tooltip: {
+                        callbacks: {
+                            label: (context) => {
+                                return context.dataset.label + ': ' + context.raw;
                             }
                         }
                     }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            // Viser kun hvert andet tick
+                            callback: function(value, index, ticks) {
+                                // ticks er array med alle tick værdier
+                                return value % 20 === 0 ? value : '';
+                            }
+                        },
+                        suggestedMax: 100,
+                        grid: {
+                            color: 'rgba(0,0,0,0.025)', // meget lys grå
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: 'Tid (timer)'
+                        },
+                        grid: {
+                            color: 'rgba(0,0,0,0.025)', // meget lys grå
+                        }
+                    }
                 }
-            });
-        },
-        updateChart() {
-            if (!this.chart && this.hasData) {
-                // Hvis chart ikke eksisterer endnu, opret den
-                this.initChart();
-                return;
             }
+        };
 
-            if (!this.chart) return;
-
-            this.chart.data.labels = this.labels;
-            this.chart.data.datasets[0].data = this.noise;
-            this.chart.data.datasets[1].data = this.humidity;
-            this.chart.data.datasets[2].data = this.temperature;
-            this.chart.data.datasets[3].data = this.light;
-
-            this.chart.update();
-        }
-    }
-}
+        const ctx = this.$refs.canvas.getContext('2d');
+        this.chart = new Chart(ctx, config);
+    },
+};

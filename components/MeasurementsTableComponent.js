@@ -1,7 +1,7 @@
 const MeasurementsTableComponent = {
     props: ["rows"],
     template: /*html*/`
-        <div class="card">
+        <div class="card white-background">
             <h2 class="title">Seneste målinger</h2>
             <table>
                 <thead>

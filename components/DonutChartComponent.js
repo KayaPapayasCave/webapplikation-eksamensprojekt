@@ -14,10 +14,10 @@ const DonutChartComponent = {
         // ---- Utils ----
         const Utils = {
             CHART_COLORS: {
-                red: 'rgb(255, 99, 132)',
-                orange: 'rgb(255, 159, 64)',
-                yellow: 'rgb(255, 205, 86)',
-                green: 'rgb(75, 192, 192)',
+                red: '#F8E080' /*'rgb(255, 99, 132)'*/,
+                orange: '#52B1D2'/*'rgb(255, 159, 64)'*/,
+                yellow: '#FFB46B' /*'rgb(255, 205, 86)'*/,
+                green: '#BBEEDD' /*'rgb(75, 192, 192)'*/,
             }
         };
 

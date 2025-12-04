@@ -14,13 +14,15 @@ const HomePage = {
                 :label="card.label"
                 :value="this[card.key] ? this[card.key][card.field] : null"
                 :unit="card.unit"
+                :class="card.colorClass"
+                :colorClass="card.colorClass"
             />
         </div>
 
         <br> <br>
 
         <div class="graphics-data-container">
-            <div class="card">
+            <div class="card white-background">
                 <h2 class="title">Oversigt over målinger</h2>
                 <br>
                 <!--<img v-bind:src="imgLineGraph">-->
@@ -48,7 +50,7 @@ const HomePage = {
 
                 <br>
             </div>
-            <div class="card">
+            <div class="card white-background">
                 <h2 class="title">Dominerende målinger</h2>
                 <br>
                 <!--<img v-bind:src="imgPieChart">-->
@@ -79,10 +81,10 @@ const HomePage = {
             ],
 
             measurementCards: [
-                { label: "Støjniveau", key: "latestNoise", field: "decibel", unit: "dB" },
-                { label: "Luftfugtighed", key: "latestHumidity", field: "humidityPercent", unit: "%" },
-                { label: "Temperatur", key: "latestTemperature", field: "celsius", unit: "°C" },
-                { label: "Lysstyrke", key: "latestLight", field: "lumen", unit: "lux" }
+                { label: "Støjniveau", key: "latestNoise", field: "decibel", unit: "dB", colorClass: "noise-color" },
+                { label: "Luftfugtighed", key: "latestHumidity", field: "humidityPercent", unit: "%", colorClass: "humidity-color" },
+                { label: "Temperatur", key: "latestTemperature", field: "celsius", unit: "°C", colorClass: "temperature-color" },
+                { label: "Lysstyrke", key: "latestLight", field: "lumen", unit: "lumen", colorClass: "light-color" }
             ],
 
             imgLineGraph: './assets/images/LineGraph.png',

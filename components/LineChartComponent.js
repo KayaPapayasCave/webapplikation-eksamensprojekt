@@ -10,12 +10,13 @@ const LineChartComponent = {
     },
     mounted() {
 
+        // ---- Utils ----
         const Utils = {
             CHART_COLORS: {
-                noise: 'rgb(255, 99, 132)',
-                humidity: 'rgb(255, 159, 64)',
-                temperature: 'rgb(255, 205, 86)',
-                light: 'rgb(75, 192, 192)',
+                noise: '#F8E080' /*'rgb(255, 99, 132)'*/,
+                humidity: '#52B1D2'/*'rgb(255, 159, 64)'*/,
+                temperature: '#FFB46B' /*'rgb(255, 205, 86)'*/,
+                light: '#BBEEDD' /*'rgb(75, 192, 192)'*/,
             }
         };
 

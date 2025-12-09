@@ -10,7 +10,7 @@ html {
 }
 
 .default-page-setup {
-    background-color: #D6F8FF; /* #FEF5E7; */
+    background-color: #EFF6E0;
     min-height: 100vh; /* Makes the background fill the entire screen height */
     padding: 3rem;
 }

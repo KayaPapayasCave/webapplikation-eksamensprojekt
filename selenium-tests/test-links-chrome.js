@@ -1,4 +1,4 @@
-// For at teste skal dette køres i terminal: node selenium-tests/test-links.js
+// For at teste skal dette køres i terminal: node selenium-tests/test-links-chrome.js
 // Hvis den virker ser vi "Links er fundet" i konsollen.
 // Den er kun lavet for Google Chrome-browseren.
 

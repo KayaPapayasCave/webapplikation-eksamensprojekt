@@ -1,4 +1,4 @@
-// For at teste skal dette køres i terminal: node selenium-tests/test-pages-and-api.js
+// For at teste skal dette køres i terminal: node selenium-tests/test-pages-and-api-chrome.js
 
 const { Builder, By, until } = require('selenium-webdriver');
 

@@ -1,8 +1,8 @@
-const baseUriNoise = "https://localhost:7080/api/Noise"
-const baseUriHumidity = "https://localhost:7080/api/Humidity"
-const baseUriTemperature = "https://localhost:7080/api/Temperature"
-const baseUriLight = "https://localhost:7080/api/Light"
-const apiUri = "https://localhost:7080/api/Light"
+const baseUriNoise = "https://localhost:7080/api/NoiseDB"
+const baseUriHumidity = "https://localhost:7080/api/HumidityDB"
+const baseUriTemperature = "https://localhost:7080/api/TemperatureDB"
+const baseUriLight = "https://localhost:7080/api/LightDB"
+const apiUri = "https://localhost:7080/api/LightDB"
 
 const routes = [
     { name: 'home', path: '/', component: HomePage },

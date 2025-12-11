@@ -6,7 +6,7 @@ const MeasurementCardComponent = {
             <p class="value" v-if="value !== null && value !== undefined">
                 {{ value }} {{ unit }}
             </p>
-            <p class="sub">Gennemsnit</p>
+            <p class="sub">Seneste måling</p>
         </div>
     `,
     data() {

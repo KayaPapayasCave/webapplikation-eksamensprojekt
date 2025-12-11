@@ -12,7 +12,7 @@ const HomePage = {
                 v-for="card in measurementCards"
                 :key="card.label"
                 :label="card.label"
-                :value="this[card.key] ? this[card.key][card.field] : null"
+                :value="this[card.key] ? formattedValue(this[card.key][card.field]) : null"
                 :unit="card.unit"
                 :class="card.colorClass"
                 :colorClass="card.colorClass"
@@ -39,8 +39,8 @@ const HomePage = {
 
                 <br>
 
-                <div class="period-selector">
-                    <button v-for="opt in periodOptions"
+                <div class="period-selection">
+                    <button class="period-button" v-for="opt in periodOptions"
                             :key="opt.value"
                             :class="{ active: selectedPeriod === opt.value }"
                             @click="selectedPeriod = opt.value">
@@ -131,11 +131,11 @@ const HomePage = {
         this.getLatest('lightsList', 'latestLight');
 
         // Sort latest measurements list by time (newest first)
-        this.latestMeasurements.sort((a, b) => new Date(b.time) - new Date(a.time));
+        this.latestMeasurements.sort((a, b) => new Date(`${b.date}T${b.time}`) - new Date(`${a.date}T${a.time}`));
     },
     methods: {
-        addRow(name, time, room, city, measurement, missed) { // Adds a row to the latest measurements table.
-            this.latestMeasurements.push({ name: name, time: time, room: room, city: city, measurement: measurement, missed: missed });
+        addRow(name, date, time, room, city, measurement, missed) { // Adds a row to the latest measurements table.
+            this.latestMeasurements.push({ name: name, date: date, time: time, room: room, city: city, measurement: measurement, missed: missed });
         },
         async getAll(url, listKey, rowName, errorKey, statuscodeKey, measurementType) { // Generic method to get all data from a given URL and store it in the specified list.
             this[errorKey] = null;
@@ -146,7 +146,7 @@ const HomePage = {
                 this[statuscodeKey] = response.status;
 
                 this[listKey].forEach(element => {
-                    this.addRow(rowName, new Date(element.time), 'R.D3.11', 'Roskilde', element[measurementType], 'Nej');
+                    this.addRow(rowName, element.date, element.time, 'R.D3.11', 'Roskilde', element[measurementType], 'Nej');
                 });
             })
             .catch(error => {
@@ -159,20 +159,27 @@ const HomePage = {
             if (!list.length) return;
 
             const copy = this[listKey].slice();   // Make a copy of the array to sort.
-            const sorted = copy.sort((a, b) => new Date(b.time) - new Date(a.time));
+            const sorted = copy.sort((a, b) => new Date(`${b.date}T${b.time}`) - new Date(`${a.date}T${a.time}`));
             this[outputKey] = sorted[0];
         },
         filterByPeriod(list) {
             const now = new Date();
             let cutoff;
-            switch(this.selectedPeriod) {
+
+            switch (this.selectedPeriod) {
                 case '24h': cutoff = new Date(now.getTime() - 24*60*60*1000); break;
-                case '7d': cutoff = new Date(now.getTime() - 7*24*60*60*1000); break;
+                case '7d':  cutoff = new Date(now.getTime() - 7*24*60*60*1000); break;
                 case '30d': cutoff = new Date(now.getTime() - 30*24*60*60*1000); break;
                 default: return list;
             }
-            return list.filter(item => new Date(item.time) >= cutoff);
-        }
+
+            const filtered = list.filter(item =>
+                new Date(`${item.date}T${item.time}`) >= cutoff
+            );
+
+            // Hvis ingen data i perioden → fallback til "vis alt"
+            return filtered.length > 0 ? filtered : list;
+        },
     },
     computed: {
         // Data for the line chart
@@ -181,10 +188,19 @@ const HomePage = {
         filteredTemperaturesList() { return this.filterByPeriod(this.temperaturesList); },
         filteredLightsList() { return this.filterByPeriod(this.lightsList); },
 
-        chartLabels() { return this.filteredNoisesList.map(x => new Date(x.time).toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' })); },
+        chartLabels() { return this.filteredNoisesList.map(x => new Date(`${x.date}T${x.time}`).toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' })); },
+        
         chartNoiseData() { return this.filteredNoisesList.map(x => x.decibel); },
         chartHumidityData() { return this.filteredHumiditiesList.map(x => x.humidityPercent); },
         chartTemperatureData() { return this.filteredTemperaturesList.map(x => x.celsius); },
-        chartLightData() { return this.filteredLightsList.map(x => x.lumen); }
+        chartLightData() { return this.filteredLightsList.map(x => x.lumen); },
+    
+        // Max 1 decimal for each measurement card.
+        formattedValue() {
+            return (value) => {
+                if (value === null || value === undefined) return null;
+                return Number(value).toFixed(1);
+            };
+        }
     }
 }

@@ -131,3 +131,21 @@ html {
     text-align: left;
     margin-bottom: 20px;
 }
+
+
+/* Period selection buttons */
+.period-button {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+/* Buttons in general */
+button {
+  background-color: #AEC3B0;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  font-size: 14px;
+}

@@ -2,6 +2,13 @@
 .topnav {
   background-color: #AEC3B0; /*#234665; */
   overflow: hidden;
+
+  height: 60px;
+  margin-left: 60px; /* plads til sidenav */
+
+  display: flex;           /* Brug flexbox */
+  align-items: center;     /* Vertikal centrering */
+  padding-left: 16px;      /* Lidt luft fra venstre */
 }
 
 /* Style the links inside the navigation bar */
@@ -55,3 +62,33 @@
     text-align: left;
   }
 } 
+
+/* Side navigation */
+.sidenav {
+  position: absolute;
+  top: 0px;   /* under topnav */
+  left: 0;
+  bottom: 0;   /* går helt ned til bunden */
+  width: 60px;
+  background-color: #598392;
+  padding-top: 20px;
+  display: flex;
+  flex-direction: column;
+
+  padding-top: 60px; /* plads til topnav */
+}
+
+/* Sidebar links */
+.sidenav a {
+  display: flex;             /* gør linket til flex-container */
+  justify-content: center;   /* centrerer horisontalt */
+  align-items: center;       /* centrerer vertikalt */
+  padding: 12px 0;           /* lodret plads til knappen */
+  text-decoration: none;
+  color: #f2f2f2;
+  font-size: 17px;           /* hvis der er tekst */
+  width: 100%;
+  height: 60px;              /* evt. fast højde på knappen */
+}
+.sidenav a:hover { background-color: #ddd; color: black; }
+.sidenav a.active { background-color: #598392; color: white; }

@@ -2,26 +2,24 @@ const MeasurementsTableComponent = {
     props: ["rows"],
     template: /*html*/`
         <div class="card white-background">
-            <h2 class="title">Seneste målinger</h2>
+            <h2 class="title">Seneste målinger - R.D3.11</h2>
             <table>
                 <thead>
                     <tr>
-                        <th>Måling</th>
                         <th>Tidspunkt for logging</th>
-                        <th>Lokale</th>
-                        <th>By</th>
-                        <th>Måling</th>
-                        <th>Udeblevet</th>
+                        <th>Støjniveau (dB)</th>
+                        <th>Luftfugtighed (%)</th>
+                        <th>Temperatur (°C)</th>
+                        <th>Lysstyrke (lumen)</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr v-for="(row, index) in paginatedRows" :key="index">
-                        <td>{{ row.name }}</td>
-                        <td>{{ format(row.time) }}</td>
-                        <td>{{ row.room }}</td>
-                        <td>{{ row.city }}</td>
-                        <td>{{ row.measurement }}</td>
-                        <td>{{ row.missed }}</td>
+                        <td>{{ format(row.date, row.time) }}</td>
+                        <td>{{ row.noise !== null ? row.noise.toFixed(1) : '-' }}</td>
+                        <td>{{ row.humidity !== null ? row.humidity.toFixed(1) : '-' }}</td>
+                        <td>{{ row.temperature !== null ? row.temperature.toFixed(1) : '-' }}</td>
+                        <td>{{ row.light !== null ? row.light.toFixed(1) : '-' }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -41,14 +39,16 @@ const MeasurementsTableComponent = {
     },
     methods: {
         // Makes a date look nice in Danish format.
-        format(date) {
-            return new Date(date).toLocaleDateString('da-DK', {
+        format(date, time) {
+            const dt = new Date(`${date}T${time}`);
+            return dt.toLocaleDateString('da-DK', {
                 day: '2-digit',
-                month: 'long',
+                month: '2-digit',
                 year: 'numeric'
-            }) + ', ' + new Date(date).toLocaleTimeString('da-DK', {
+            }) + ', ' + dt.toLocaleTimeString('da-DK', {
                 hour: '2-digit',
-                minute: '2-digit'
+                minute: '2-digit',
+                second: '2-digit'
             });
         }
     },

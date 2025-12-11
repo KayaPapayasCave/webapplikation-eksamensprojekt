@@ -61,7 +61,10 @@ const MeasurementPage = {
         this.getLatest('lightsList', 'latestLight');
 
         // Sort latest measurements list by time (newest first)
-        this.latestMeasurements.sort((a, b) => new Date(b.time) - new Date(a.time));
+        //this.latestMeasurements.sort((a, b) => new Date(b.time) - new Date(a.time));
+
+        // Opdater latestMeasurements med alle fire målinger på samme række
+        this.mergeMeasurements();
     },
     methods: {
         addRow(name, time, room, city, measurement, missed) { // Adds a row to the latest measurements table.
@@ -102,7 +105,40 @@ const MeasurementPage = {
                 default: return list;
             }
             return list.filter(item => new Date(item.time) >= cutoff);
-        }
+        },
+        mergeMeasurements() {
+            const merged = [];
+
+            // Assume that all lists are sortet by date and time.
+            const allLists = [this.noisesList, this.humiditiesList, this.temperaturesList, this.lightsList];
+
+            // Make a set of all unique timestamps
+            const timestamps = new Set();
+            allLists.forEach(list => { list.forEach(item => { timestamps.add(`${item.date}T${item.time}`); }); });
+
+            // For each unique timestamp, find measurement from each list
+            timestamps.forEach(ts => {
+                const [date, time] = ts.split('T');
+                const noise = this.noisesList.find(x => `${x.date}T${x.time}` === ts);
+                const humidity = this.humiditiesList.find(x => `${x.date}T${x.time}` === ts);
+                const temperature = this.temperaturesList.find(x => `${x.date}T${x.time}` === ts);
+                const light = this.lightsList.find(x => `${x.date}T${x.time}` === ts);
+
+                merged.push({date, time, 
+                    noise: noise ? noise.decibel : null, 
+                    humidity: humidity ? humidity.humidityPercent : null,
+                    temperature: temperature ? temperature.celsius : null,
+                    light: light ? light.lumen : null,
+                    room: 'R.D3.11',   
+                    city: 'Roskilde',
+                });
+            });
+
+            // Sort by time (newest first)
+            merged.sort((a, b) => new Date(`${b.date}T${b.time}`) - new Date(`${a.date}T${a.time}`));
+
+            this.latestMeasurements = merged;
+        },
     },
     computed: {
         // Data for the line chart

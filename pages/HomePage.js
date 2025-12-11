@@ -95,8 +95,6 @@ const HomePage = {
         </div>
 
         <br> <br>
-
-        <measurements-table :rows="latestMeasurements"></measurements-table>
     </div>
     `,
     name: "DashboardPage",
@@ -162,51 +160,6 @@ const HomePage = {
     },
     mounted() {
         this.loadWeather(); // Loader vejr når komponent starter
-    },
-    methods: {
-        async loadWeather() {
-            this.loading = true;
-            this.error = null;
-
-            try {
-                // Promise.all kører begge requests parallelt.
-                const [resTemp, resHum] = await Promise.all([
-                    axios.get("https://dmigw.govcloud.dk/v2/metObs/collections/observation/items", {
-                        params: {
-                            "api-key": "b3db5738-de35-4386-a5ad-7403d08e1a98",
-                            parameterId: "temp_dry", // Henter temperatur
-                            stationId: this.selectedStationId
-                        }
-                    }),
-                    axios.get("https://dmigw.govcloud.dk/v2/metObs/collections/observation/items", {
-                        params: {
-                            "api-key": "b3db5738-de35-4386-a5ad-7403d08e1a98",
-                            parameterId: "humidity", // Henter luftfugtighed
-                            stationId: this.selectedStationId
-                        }
-                    })
-                ]);
-
-                const tempItem = resTemp.data.features?.[0]?.properties;
-                const humItem  = resHum.data.features?.[0]?.properties;
-
-                if (!tempItem || !humItem) {
-                    throw new Error("Ingen data tilgængelig for denne station");
-                }
-
-                this.temperature = tempItem.value;
-                this.humidity = humItem.value;
-                this.stationId = tempItem.stationId;
-                this.stationName = this.stations[this.stationId] ?? "Ukendt station";
-                this.observedTime = tempItem.observed;
-            }
-            catch (err) {
-                this.error = err.message;
-            }
-            finally {
-                this.loading = false;
-            }
-        }
     },
     async created() { // created() is called automatically when the page is loaded.
         console.log("created method called");
@@ -275,6 +228,49 @@ const HomePage = {
             // Hvis ingen data i perioden → fallback til "vis alt"
             return filtered.length > 0 ? filtered : list;
         },
+        async loadWeather() {
+            this.loading = true;
+            this.error = null;
+
+            try {
+                // Promise.all kører begge requests parallelt.
+                const [resTemp, resHum] = await Promise.all([
+                    axios.get("https://dmigw.govcloud.dk/v2/metObs/collections/observation/items", {
+                        params: {
+                            "api-key": "b3db5738-de35-4386-a5ad-7403d08e1a98",
+                            parameterId: "temp_dry", // Henter temperatur
+                            stationId: this.selectedStationId
+                        }
+                    }),
+                    axios.get("https://dmigw.govcloud.dk/v2/metObs/collections/observation/items", {
+                        params: {
+                            "api-key": "b3db5738-de35-4386-a5ad-7403d08e1a98",
+                            parameterId: "humidity", // Henter luftfugtighed
+                            stationId: this.selectedStationId
+                        }
+                    })
+                ]);
+
+                const tempItem = resTemp.data.features?.[0]?.properties;
+                const humItem  = resHum.data.features?.[0]?.properties;
+
+                if (!tempItem || !humItem) {
+                    throw new Error("Ingen data tilgængelig for denne station");
+                }
+
+                this.temperature = tempItem.value;
+                this.humidity = humItem.value;
+                this.stationId = tempItem.stationId;
+                this.stationName = this.stations[this.stationId] ?? "Ukendt station";
+                this.observedTime = tempItem.observed;
+            }
+            catch (err) {
+                this.error = err.message;
+            }
+            finally {
+                this.loading = false;
+            }
+        }
     },
     computed: {
         // Data for the line chart

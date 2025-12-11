@@ -74,7 +74,7 @@ const TestPage = {
             <h3 v-if="latestNoise">Latest noise: {{latestNoise.decibel}} dB</h3>
             <h3 v-if="latestHumidity">Latest humidity: {{latestHumidity.humidityPercent}} %</h3>
             <h3 v-if="latestTemperature">Latest temperature: {{latestTemperature.celsius}} °C</h3>
-            <h3 v-if="latestLight">Latest light: {{latestLight.lumen}} lux</h3>
+            <h3 v-if="latestLight">Latest light: {{latestLight.lumen}} lumen</h3>
 
             <div class="image-container">
                 <img v-bind:src="image" class="image">

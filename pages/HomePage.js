@@ -6,11 +6,6 @@ const HomePage = {
     },
     template: /*html*/`
     <div class="default-page-setup">
-        <div>{{ calculateNoiseScore(latestNoise) }}</div>
-        <div>{{ calculateTemperatureScore(latestTemperature) }}</div>
-        <div>{{ calculateHumidityScore(latestHumidity) }}</div>
-        <div>{{ calculateLightScore(latestLight) }}</div>
-
         <div class="current-data-container">
             <div 
                 v-for="card in measurementCards"
@@ -20,7 +15,7 @@ const HomePage = {
             >
                 <i :class="card.iconClass"></i>
                 <p class="label">{{ card.label }}</p>
-                <p class="value" v-if="this[card.key] !== null && this[card.key] !== undefined">
+                <p class="value" v-if="this[card.key]?.[card.field] !== undefined">
                     {{ formattedValue(this[card.key][card.field]) }} {{ card.unit }}
                 </p>
                 <p class="sub">Seneste måling</p>
@@ -68,10 +63,15 @@ const HomePage = {
                     :humidity="latestHumidity ? latestHumidity.humidityPercent : null"
                     :temperature="latestTemperature ? latestTemperature.celsius : null"
                     :light="latestLight ? latestLight.lumen : null"
+                    :totalScore="calculateTotalScore()"
                 ></donut-chart>
                 <br>
             </div>
         </div>
+
+        <br> <br>
+
+        <measurements-table :rows="latestMeasurements"></measurements-table>
 
         <br> <br>
 
@@ -87,7 +87,7 @@ const HomePage = {
             <div v-else>
                 <div class="weather-emoji">{{ weatherEmoji }}</div>
                 <p>
-                    Temperatur: <strong>{{ temperature }}°C {{ weatherEmoji }}</strong>
+                    Temperatur: <strong>{{ temperature }}°C</strong>
                 </p>   
                 <p>
                     Luftfugtighed: <strong>{{ humidity }}%</strong>
@@ -378,6 +378,18 @@ const HomePage = {
         },
         pointCalculator(score, point) {
             return (score/100)*point;
+        },
+        calculateTotalScore() {
+            if (!this.latestNoise || !this.latestTemperature || !this.latestHumidity || !this.latestLight) {
+                return 0; // eller null
+            }
+
+            const noiseScore = this.pointCalculator(this.calculateNoiseScore(this.latestNoise), 35);
+            const temperatureScore = this.pointCalculator(this.calculateTemperatureScore(this.latestTemperature), 25);
+            const humidityScore = this.pointCalculator(this.calculateHumidityScore(this.latestHumidity), 25);
+            const lightScore = this.pointCalculator(this.calculateLightScore(this.latestLight), 15);
+
+            return noiseScore + temperatureScore + humidityScore + lightScore;
         }
     },
     computed: {

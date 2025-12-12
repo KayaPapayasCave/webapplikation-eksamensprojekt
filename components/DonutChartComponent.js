@@ -1,5 +1,5 @@
 const DonutChartComponent = {
-    props: ["noise", "humidity", "temperature", "light"],
+    props: ["noise", "humidity", "temperature", "light", "totalScore"],
     template: /*html*/`
         <div>
             <canvas ref="canvas"></canvas>
@@ -39,7 +39,7 @@ const DonutChartComponent = {
 
                 // Lav tekst som array af linjer
                 const lines = [
-                    { text: `${this.calculateTotalScore() ?? "?"} / 100`, color: "#333", font: "bold 28px Arial" },
+                    { text: `${Number(this.totalScore).toFixed(1) ?? "?"} / 100`, color: "#333", font: "bold 28px Arial" },
                     { text: "Samlet Score", color: "#888", font: "18px Arial" }
                 ];
 
@@ -111,9 +111,4 @@ const DonutChartComponent = {
         const ctx = this.$refs.canvas.getContext('2d');
         this.chart = new Chart(ctx, config);
     },
-    methods: {
-        calculateTotalScore(){
-            return 78; //(this.noise ?? 0) + (this.humidity ?? 0) + (this.temperature ?? 0) + (this.light ?? 0);
-        }
-    }
 }

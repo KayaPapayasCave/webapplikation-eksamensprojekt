@@ -5,12 +5,93 @@ const MeasurementPage = {
     },
     template: /*html*/`
     <div class="default-page-setup">
-        <measurements-table :rows="latestMeasurements"></measurements-table>
+        <!-- <measurements-table :rows="latestMeasurements"></measurements-table> -->
+
+        <!-- <br> <br> -->
+
+        <div class="card white-background">
+            <h2 class="title">Sundhedsscore</h2>
+            <p>
+                Sundhedsscoren giver et hurtigt overblik over, hvor godt indeklimaet i rummet er lige nu. <br>
+                Vi måler fire ting: støjniveau, temperatur, luftfugtighed og lysstyrke. Ud fra dem beregner vi en samlet score, 
+                der viser, om omgivelserne gør det lettere eller sværere at koncentrere sig.
+
+                <br><br>
+
+                Scoren hjælper både studerende og undervisere med at få en bedre fornemmelse af, 
+                hvordan rummet påvirker fokus og trivsel - noget der kan være svært at mærke i hverdagen.
+            </p>
+        </div>
+
+        <br> <br>
+
+        <div class="current-data-container">
+            <div 
+                v-for="card in healthyScoreCards"
+                :key="card.label"
+                class="card"
+                :class="card.colorClass"
+            >
+                <i :class="card.iconClass"></i>
+                <p class="label">{{ card.label }}</p>
+                <p class="value">
+                    {{ card.healthyScore }}
+                </p>
+                <p class="sub">Sundhedsscore</p>
+            </div>
+        </div>
+
+        <br> <br>
+
+        <div class="card white-background">
+            <h2 class="title">Hvordan beregner vi scoren?</h2>
+            <p>
+                For hver måling giver vi et tal mellem 0 og 100, hvor 100 er optimalt. Derefter vægter vi dem forskelligt, alt efter hvor meget de typisk påvirker koncentrationen.
+            </p>
+
+            <br>
+
+            <ul>
+                <li>
+                    <strong>Støjniveau (35 % af totalen):</strong><br>
+                    Når rummet er stille (under ca. 60 dB), får man den højeste score. Jo tættere støjen kommer på 75 dB, jo lavere bliver scoren.
+                </li>
+                <br>
+                <li>
+                    <strong>Temperatur (25 %):</strong><br>
+                    Temperaturen scorer højest i området omkring 20–21 grader. Er det for koldt eller for varmt, falder scoren gradvist.
+                </li>
+                <br>
+                <li>
+                    <strong>Luftfugtighed (25 %):</strong><br>
+                    For lav eller for høj luftfugtighed kan give ubehag eller dårlig luftkvalitet. Derfor falder scoren uden for det mest komfortable område.
+                </li>
+                <br>
+                <li>
+                    <strong>Lysstyrke (15 %):</strong><br>
+                    Både for lidt og for meget lys gør det sværere at koncentrere sig. Den højeste score ligger i det behagelige område midt imellem.
+                </li>
+            </ul>
+
+            <br>
+
+            <p>
+                Alle fire scores bliver lagt sammen og giver én samlet <strong>Sundhedsscore</strong>.  
+                Høje tal betyder gode forhold for læring og fokus, mens lave tal kan være et tegn på, at noget i rummet bør justeres – f.eks. åbne et vindue, dæmpe lyset eller tage en pause.
+            </p>
+        </div>
     </div>
     `,
     name: "DashboardPage",
     data() {
         return {
+            healthyScoreCards: [
+                { label: "Støjniveau", key: "latestNoise", field: "decibel", unit: "dB", colorClass: "noise-color", iconClass: "fa-solid fa-volume-high", healthyScore: "0-60" },
+                { label: "Luftfugtighed", key: "latestHumidity", field: "humidityPercent", unit: "%", colorClass: "humidity-color", iconClass: "fa-solid fa-droplet", healthyScore: "12,5-45" },
+                { label: "Temperatur", key: "latestTemperature", field: "celsius", unit: "°C", colorClass: "temperature-color", iconClass: "fa-solid fa-temperature-high", healthyScore: "20-22" },
+                { label: "Lysstyrke", key: "latestLight", field: "lumen", unit: "lumen", colorClass: "light-color", iconClass: "fa-solid fa-lightbulb", healthyScore: "1000-5000" }
+            ],
+
             latestMeasurements: [],
             
             noisesList: [],

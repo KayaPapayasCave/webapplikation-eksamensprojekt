@@ -320,6 +320,7 @@ const HomePage = {
         },
         calculateNoiseScore(noise) {
             // lyd
+            let score;
             if (noise.decibel <= 60) {
                 score = 100.0;
             } else if (noise.decibel >= 75) {
@@ -332,6 +333,7 @@ const HomePage = {
         },
         calculateTemperatureScore(temperature) {
             // temperatur
+            let score;
             if (temperature.celsius <= 17) {
                 score = 0.0;
             } else if (temperature.celsius <= 21) {                     
@@ -346,12 +348,13 @@ const HomePage = {
         },
         calculateHumidityScore(humidity) {
             // fugtighed
-            if (humidity.percent <= 0) {
+            let score;
+            if (humidity.humidityPercent <= 0) {
                 score = 50.0;                        
-            } else if (humidity.percent <= 12.5) {
-                score = 50.0 + 4.0 * humidity.percent;             
-            } else if (humidity.percent < 45) {    
-                score = (40.0/13.0) * (45.0 - humidity.percent);    
+            } else if (humidity.humidityPercent <= 12.5) {
+                score = 50.0 + 4.0 * humidity.humidityPercent;             
+            } else if (humidity.humidityPercent < 45) {    
+                score = (40.0/13.0) * (45.0 - humidity.humidityPercent);    
             } else {
                 score = 0.0;
             }
@@ -360,22 +363,21 @@ const HomePage = {
         },
         calculateLightScore(light) {
             // lys
-            if (light.lux <= 200) {
+            let score;
+            if (light.lumen <= 200) {
                 score = 0.0;
-            } else if (light.lux <= 5000) {    
-                score = 100.0 * (light.lux - 200.0) / (5000.0 - 200.0);
-            } else if (light.lux < 10000) {    
-                score = 100.0 * (10000.0 - light.lux) / (10000.0 - 5000.0);
+            } else if (light.lumen <= 5000) {    
+                score = 100.0 * (light.lumen - 200.0) / (5000.0 - 200.0);
+            } else if (light.lumen < 10000) {    
+                score = 100.0 * (10000.0 - light.lumen) / (10000.0 - 5000.0);
             } else {
                 score = 0.0;
             }
 
             return score;
         },
-        calculateTotalScore(noise, temperature, humidity, light) {
-
-
-            return score;
+        pointCalculator(score, point) {
+            return (score/100)*point;
         }
     },
     computed: {

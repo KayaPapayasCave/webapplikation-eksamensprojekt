@@ -232,5 +232,5 @@ const ScorePage = {
         chartHumidityData() { return this.filteredHumiditiesList.map(x => x.humidityPercent); },
         chartTemperatureData() { return this.filteredTemperaturesList.map(x => x.celsius); },
         chartLightData() { return this.filteredLightsList.map(x => x.lumen); },
-    }
+    },
 }

@@ -390,7 +390,19 @@ const HomePage = {
             const lightScore = this.pointCalculator(this.calculateLightScore(this.latestLight), 15);
 
             return noiseScore + temperatureScore + humidityScore + lightScore;
-        }
+        },
+        calculateRowTotalScore(noise, temperature, humidity, light) {
+            if (!noise || !temperature || !humidity || !light) {
+                return 0; // eller null
+            }
+
+            const noiseScore = this.pointCalculator(this.calculateNoiseScore(noise), 35);
+            const temperatureScore = this.pointCalculator(this.calculateTemperatureScore(temperature), 25);
+            const humidityScore = this.pointCalculator(this.calculateHumidityScore(humidity), 25);
+            const lightScore = this.pointCalculator(this.calculateLightScore(light), 15);
+
+            return noiseScore + temperatureScore + humidityScore + lightScore;
+        },
     },
     computed: {
         // Data for the line chart

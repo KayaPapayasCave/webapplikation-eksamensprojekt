@@ -1,15 +1,16 @@
 const LineChartComponent = {
     props: ["labels", "noise", "humidity", "temperature", "light"],
     template: /*html*/`
-        <canvas ref="canvas"></canvas>
-    `,
+        <div>
+            <canvas ref="canvas"></canvas>
+        </div>
+        `,
     data() {
         return {
             chart: null
         }
     },
     mounted() {
-
         // ---- Utils ----
         const Utils = {
             CHART_COLORS: {
@@ -21,13 +22,13 @@ const LineChartComponent = {
         };
 
         // ---- X-aksen: 24 timer ----
-        const hours = Array.from({ length: 24 }, (_, i) => i + ":00");
+        //const hours = Array.from({ length: 24 }, (_, i) => i + ":00");
 
         // ---- Test Data over 24 timer -----
-        const noiseValues = Array.from({length:24}, (_,i) => i * 2);       // 0,2,4,...  
-        const humidityValues = Array.from({length:24}, (_,i) => 50);       // konstant 50  
-        const temperatureValues = Array.from({length:24}, (_,i) => 20+i);  // 20,21,...  
-        const lightValues = Array.from({length:24}, (_,i) => 80-i);        // 80,79,...  
+        //const noiseValues = Array.from({length:24}, (_,i) => i * 2);       // 0,2,4,...  
+        //const humidityValues = Array.from({length:24}, (_,i) => 50);       // konstant 50  
+        //const temperatureValues = Array.from({length:24}, (_,i) => 20+i);  // 20,21,...  
+        //const lightValues = Array.from({length:24}, (_,i) => 80-i);        // 80,79,...  
 
         const data = {
             labels: this.labels, // array med tidspunkter
@@ -83,7 +84,7 @@ const LineChartComponent = {
                     tooltip: {
                         callbacks: {
                             label: (context) => {
-                                return context.dataset.label + ': ' + context.raw;
+                                return context.dataset.label + ': ' + Number(context.raw).toFixed(1);
                             }
                         }
                     }
@@ -106,11 +107,19 @@ const LineChartComponent = {
                     x: {
                         title: {
                             display: true,
-                            text: 'Tid (timer)'
+                            text: 'Tidspunkt'
                         },
                         grid: {
                             color: 'rgba(0,0,0,0.025)', // meget lys grå
-                        }
+                        },
+                        // Til kun at vise tidspunkt uden dato
+                        // ticks: {
+                        //     callback: function(value, index, ticks) {
+                        //         const label = this.getLabelForValue(value);
+                        //         const d = new Date(label);
+                        //         return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                        //     }
+                        // }
                     }
                 }
             }

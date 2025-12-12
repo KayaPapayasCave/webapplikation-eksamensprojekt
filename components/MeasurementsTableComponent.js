@@ -43,7 +43,7 @@ const MeasurementsTableComponent = {
             const dt = new Date(`${date}T${time}`);
             return dt.toLocaleDateString('da-DK', {
                 day: '2-digit',
-                month: '2-digit',
+                month: 'short',
                 year: 'numeric'
             }) + ', ' + dt.toLocaleTimeString('da-DK', {
                 hour: '2-digit',

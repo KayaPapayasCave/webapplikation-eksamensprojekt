@@ -74,16 +74,27 @@ html {
 .card {
   border: 1px solid #03045E;
   border-radius: 12px;
-  padding: 20px;
+  padding: 18px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  text-align: center;
+  text-align: left;
+
+  position: relative; /* Gør det muligt at placere ikon absolut i forhold til kortet */
+}
+/* The icon in the top-right corner of each card */
+.card i {
+  position: absolute;
+  top: 20px;     /* afstand fra toppen af kortet */
+  right: 20px;   /* afstand fra højre side af kortet */
+  font-size: 20px;
+  color: rgba(0,0,0,0.5); /* lidt dæmpet farve */
 }
 
 
 /* The text fields inside the cards */
 .label {
-  font-size: 14px;
-  color: #555;
+  font-size: 16px;
+  color: black; /*#555;*/
+  padding-bottom: 2px;
 }
 .value {
   font-size: 22px;

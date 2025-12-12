@@ -1,8 +1,11 @@
 const DonutChartComponent = {
     props: ["noise", "humidity", "temperature", "light"],
     template: /*html*/`
-        <canvas ref="canvas"></canvas>
-    `,
+        <div>
+            <canvas ref="canvas"></canvas>
+            <span style="display:none">{{ noise?.decibel ?? '' }}{{ humidity?.humidityPercent ?? '' }}{{ temperature?.celsius ?? '' }}{{ light?.lux ?? '' }}</span>
+        </div>
+        `,
     data() {
         return {
             chart: null,
@@ -21,18 +24,44 @@ const DonutChartComponent = {
             }
         };
 
-        // ---- Data fra props ----
-        const values = [
-            this.noise,
-            this.humidity,
-            this.temperature,
-            this.light
-        ];
+        // ---- Text in center ----
+        const centerTextPlugin = {
+            id: 'centerText',
+            afterDraw: (chart) => {
+                // Stop hvis det ikke er en doughnut chart
+                if (chart.config.type !== 'doughnut') return;
 
-        // ---- Setup ----
-        const DATA_COUNT = 4;
-        //const NUMBER_CFG = { count: DATA_COUNT, min: 0, max: 100 };
+                const { ctx, chartArea: { width, height } } = chart;
 
+                ctx.save();
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+
+                // Lav tekst som array af linjer
+                const lines = [
+                    { text: `${this.calculateTotalScore() ?? "?"} / 100`, color: "#333", font: "bold 28px Arial" },
+                    { text: "Samlet Score", color: "#888", font: "18px Arial" }
+                ];
+
+                const lineHeight = 30; // afstand mellem linjer
+
+                // Start højere oppe så det hele centreres
+                let y = height / 2 + (lines.length - 1) * lineHeight / 2;
+
+                // Tegn hver linje
+                for (const line of lines) {
+                    ctx.font = line.font;
+                    ctx.fillStyle = line.color;
+                    ctx.fillText(line.text, width / 2, y);
+                    y += lineHeight;
+                }
+
+                ctx.restore();
+            }
+        };
+        Chart.register(centerTextPlugin);
+
+        // ---- Data ----
         const data = {
             labels: ['Stø...', 'Luftf...', 'Te...', 'Ly...'],
             datasets: [
@@ -66,10 +95,10 @@ const DonutChartComponent = {
                                 // Her kan du hente index
                                 const i = context.dataIndex;
                                 return [
-                                    'Støjniveau: ' + this.noise,
-                                    'Luftfugtighed: ' + this.humidity,
-                                    'Temperatur: ' + this.temperature,
-                                    'Lysstyrke: ' + this.light
+                                    'Støjniveau: ' + Number(this.noise).toFixed(1),
+                                    'Luftfugtighed: ' + Number(this.humidity).toFixed(1),
+                                    'Temperatur: ' + Number(this.temperature).toFixed(1),
+                                    'Lysstyrke: ' + Number(this.light).toFixed(1)
                                 ][i];
                             }
                         }
@@ -81,5 +110,10 @@ const DonutChartComponent = {
         // ---- Create chart ----
         const ctx = this.$refs.canvas.getContext('2d');
         this.chart = new Chart(ctx, config);
+    },
+    methods: {
+        calculateTotalScore(){
+            return 78; //(this.noise ?? 0) + (this.humidity ?? 0) + (this.temperature ?? 0) + (this.light ?? 0);
+        }
     }
 }

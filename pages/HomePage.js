@@ -1,6 +1,5 @@
 const HomePage = {
     components: {
-        'measurement-card-component': MeasurementCardComponent,
         'line-chart': LineChartComponent,
         'donut-chart': DonutChartComponent,
         'measurements-table': MeasurementsTableComponent
@@ -37,15 +36,19 @@ const HomePage = {
         <br> <br>
 
         <div class="current-data-container">
-            <measurement-card-component
+            <div 
                 v-for="card in measurementCards"
                 :key="card.label"
-                :label="card.label"
-                :value="this[card.key] ? formattedValue(this[card.key][card.field]) : null"
-                :unit="card.unit"
+                class="card"
                 :class="card.colorClass"
-                :colorClass="card.colorClass"
-            />
+            >
+                <i :class="card.iconClass"></i>
+                <p class="label">{{ card.label }}</p>
+                <p class="value" v-if="this[card.key] !== null && this[card.key] !== undefined">
+                    {{ formattedValue(this[card.key][card.field]) }} {{ card.unit }}
+                </p>
+                <p class="sub">Seneste måling</p>
+            </div>
         </div>
 
         <br> <br>
@@ -57,8 +60,8 @@ const HomePage = {
                 <!--<img v-bind:src="imgLineGraph">-->
 
                 <line-chart
-                    v-if="chartLabels.length"
-                    style="width: 800px; height: 300px; margin: auto;"
+                    v-if="dataLoaded && filteredLatestMeasurements.length"
+                    style="margin: auto;"
                     :labels="chartLabels"
                     :noise="chartNoiseData"
                     :humidity="chartHumidityData"
@@ -108,10 +111,10 @@ const HomePage = {
             ],
 
             measurementCards: [
-                { label: "Støjniveau", key: "latestNoise", field: "decibel", unit: "dB", colorClass: "noise-color" },
-                { label: "Luftfugtighed", key: "latestHumidity", field: "humidityPercent", unit: "%", colorClass: "humidity-color" },
-                { label: "Temperatur", key: "latestTemperature", field: "celsius", unit: "°C", colorClass: "temperature-color" },
-                { label: "Lysstyrke", key: "latestLight", field: "lumen", unit: "lumen", colorClass: "light-color" }
+                { label: "Støjniveau", key: "latestNoise", field: "decibel", unit: "dB", colorClass: "noise-color", iconClass: "fa-solid fa-volume-high" },
+                { label: "Luftfugtighed", key: "latestHumidity", field: "humidityPercent", unit: "%", colorClass: "humidity-color", iconClass: "fa-solid fa-droplet" },
+                { label: "Temperatur", key: "latestTemperature", field: "celsius", unit: "°C", colorClass: "temperature-color", iconClass: "fa-solid fa-temperature-high" },
+                { label: "Lysstyrke", key: "latestLight", field: "lumen", unit: "lumen", colorClass: "light-color", iconClass: "fa-solid fa-lightbulb" }
             ],
 
             imgLineGraph: './assets/images/LineGraph.png',
@@ -156,6 +159,7 @@ const HomePage = {
 
             selectedStationId: "06170",
             
+            dataLoaded: false,
         }
     },
     mounted() {
@@ -179,7 +183,17 @@ const HomePage = {
         this.getLatest('lightsList', 'latestLight');
 
         // Sort latest measurements list by time (newest first)
-        this.latestMeasurements.sort((a, b) => new Date(`${b.date}T${b.time}`) - new Date(`${a.date}T${a.time}`));
+        //this.latestMeasurements.sort((a, b) => new Date(`${b.date}T${b.time}`) - new Date(`${a.date}T${a.time}`));
+
+        // Opdater latestMeasurements med alle fire målinger på samme række
+        this.mergeMeasurements();
+
+        console.log("NoisesList:", this.noisesList);
+        console.log("HumiditiesList:", this.humiditiesList);
+        console.log("TemperaturesList:", this.temperaturesList);
+        console.log("LightsList:", this.lightsList);
+
+        this.dataLoaded = true; // Sæt til true når alt er klar
     },
     methods: {
         addRow(name, date, time, room, city, measurement, missed) { // Adds a row to the latest measurements table.
@@ -226,7 +240,40 @@ const HomePage = {
             );
 
             // Hvis ingen data i perioden → fallback til "vis alt"
-            return filtered.length > 0 ? filtered : list;
+            return filtered.length > 1 ? filtered : list;
+        },
+        mergeMeasurements() {
+            const merged = [];
+
+            // Assume that all lists are sortet by date and time.
+            const allLists = [this.noisesList, this.humiditiesList, this.temperaturesList, this.lightsList];
+
+            // Make a set of all unique timestamps
+            const timestamps = new Set();
+            allLists.forEach(list => { list.forEach(item => { timestamps.add(`${item.date}T${item.time}`); }); });
+
+            // For each unique timestamp, find measurement from each list
+            timestamps.forEach(ts => {
+                const [date, time] = ts.split('T');
+                const noise = this.noisesList.find(x => `${x.date}T${x.time}` === ts);
+                const humidity = this.humiditiesList.find(x => `${x.date}T${x.time}` === ts);
+                const temperature = this.temperaturesList.find(x => `${x.date}T${x.time}` === ts);
+                const light = this.lightsList.find(x => `${x.date}T${x.time}` === ts);
+
+                merged.push({date, time, 
+                    noise: noise ? noise.decibel : null, 
+                    humidity: humidity ? humidity.humidityPercent : null,
+                    temperature: temperature ? temperature.celsius : null,
+                    light: light ? light.lumen : null,
+                    room: 'R.D3.11',   
+                    city: 'Roskilde',
+                });
+            });
+
+            // Sort by time (newest first)
+            merged.sort((a, b) => new Date(`${b.date}T${b.time}`) - new Date(`${a.date}T${a.time}`));
+
+            this.latestMeasurements = merged;
         },
         async loadWeather() {
             this.loading = true;
@@ -274,17 +321,13 @@ const HomePage = {
     },
     computed: {
         // Data for the line chart
-        filteredNoisesList() { return this.filterByPeriod(this.noisesList); },
-        filteredHumiditiesList() { return this.filterByPeriod(this.humiditiesList); },
-        filteredTemperaturesList() { return this.filterByPeriod(this.temperaturesList); },
-        filteredLightsList() { return this.filterByPeriod(this.lightsList); },
+        filteredLatestMeasurements() { return this.filterByPeriod(this.latestMeasurements); },
 
-        chartLabels() { return this.filteredNoisesList.map(x => new Date(`${x.date}T${x.time}`).toLocaleTimeString('da-DK', { hour: '2-digit', minute: '2-digit' })); },
-        
-        chartNoiseData() { return this.filteredNoisesList.map(x => x.decibel); },
-        chartHumidityData() { return this.filteredHumiditiesList.map(x => x.humidityPercent); },
-        chartTemperatureData() { return this.filteredTemperaturesList.map(x => x.celsius); },
-        chartLightData() { return this.filteredLightsList.map(x => x.lumen); },
+        chartTemperatureData() { return this.filteredLatestMeasurements.map(x => x.temperature); },
+        chartNoiseData() { return this.filteredLatestMeasurements.map(x => x.noise); },
+        chartHumidityData() { return this.filteredLatestMeasurements.map(x => x.humidity); },
+        chartLightData() { return this.filteredLatestMeasurements.map(x => x.light); },
+        chartLabels() { return this.filteredLatestMeasurements.map(x => `${x.date} ${x.time}`); },
     
         // Max 1 decimal for each measurement card.
         formattedValue() {
@@ -296,11 +339,12 @@ const HomePage = {
 
         weatherEmoji() {
         if (this.temperature < 10) {
-            return "☁️";
-        } else if (this.temperature >= 10 && this.temperature <= 15) {
-            return "⛅";
-        } else {
-            return "☀️";
-        }
+                return "☁️";
+            } else if (this.temperature >= 10 && this.temperature <= 15) {
+                return "⛅";
+            } else {
+                return "☀️";
+            }
+        },
     }
-}}
+}

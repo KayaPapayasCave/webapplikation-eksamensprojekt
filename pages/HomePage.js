@@ -349,12 +349,12 @@ const HomePage = {
         calculateHumidityScore(humidity) {
             // fugtighed
             let score;
-            if (humidity.humidityPercent <= 0) {
-                score = 50.0;                        
-            } else if (humidity.humidityPercent <= 12.5) {
-                score = 50.0 + 4.0 * humidity.humidityPercent;             
-            } else if (humidity.humidityPercent < 45) {    
-                score = (40.0/13.0) * (45.0 - humidity.humidityPercent);    
+            if (humidity.humidityPercent <= 40) {
+                score = 0.0;                        
+            } else if (humidity.humidityPercent <= 50) {
+                score = 50.0 * (humidity.humidityPercent-40)/(50.0 - 40.0);             
+            } else if (humidity.humidityPercent < 60) {    
+                score = 100.0 * (60.0 - humidity.humidityPercent)/(60.0-50.0);    
             } else {
                 score = 0.0;
             }
@@ -364,10 +364,10 @@ const HomePage = {
         calculateLightScore(light) {
             // lys
             let score;
-            if (light.lumen <= 200) {
+            if (light.lumen <= 1000) {
                 score = 0.0;
             } else if (light.lumen <= 5000) {    
-                score = 100.0 * (light.lumen - 200.0) / (5000.0 - 200.0);
+                score = 100.0 * (light.lumen - 1000.0) / (5000.0 - 1000.0);
             } else if (light.lumen < 10000) {    
                 score = 100.0 * (10000.0 - light.lumen) / (10000.0 - 5000.0);
             } else {

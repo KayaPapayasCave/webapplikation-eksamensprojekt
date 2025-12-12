@@ -1,0 +1,8 @@
+/* The icon in the top-right corner of each card */
+.weather-emoji {
+  position: absolute;
+  top: 20px;     /* afstand fra toppen af kortet */
+  right: 20px;   /* afstand fra højre side af kortet */
+  font-size: 60px;
+  /*color: rgba(0,0,0,0.5); /* lidt dæmpet farve */
+}

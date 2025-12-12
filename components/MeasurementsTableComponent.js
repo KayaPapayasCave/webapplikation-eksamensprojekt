@@ -24,7 +24,7 @@ const MeasurementsTableComponent = {
                 </tbody>
             </table>
 
-            <div class="pagination" v-if="totalPages > 1" style="margin-top: 1rem;">
+            <div class="pagination align-center" v-if="totalPages > 1" style="margin-top: 1rem;">
                 <button :disabled="currentPage === 1" style="margin-right: 10px;" @click="currentPage--">Forrige</button>
                 <span>Side {{ currentPage }} af {{ totalPages }}</span>
                 <button :disabled="currentPage === totalPages" style="margin-left: 10px;" @click="currentPage++">Næste</button>

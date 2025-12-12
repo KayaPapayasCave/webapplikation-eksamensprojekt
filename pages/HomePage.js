@@ -6,34 +6,10 @@ const HomePage = {
     },
     template: /*html*/`
     <div class="default-page-setup">
-
-        <div class="card white-background">
-            <label>Vælg station: </label>
-            <select v-model="selectedStationId">
-                <option v-for="(name, id) in stations" :key="id" :value="id">
-                    {{ name }} ({{ id }})
-                </option>
-            </select>
-            <button @click="loadWeather">Hent vejr</button>
-            <div v-if="loading">Loading weather...</div>
-            <div v-else-if="error">Error: {{ error }}</div>
-            <div v-else>
-                <p>
-                    Nuværende temperatur: <strong>{{ temperature }}°C {{ weatherEmoji }}</strong>
-                </p>   
-                <p>
-                    Nuværende luftfugtighed: <strong>{{ humidity }}%</strong>
-                </p>
-                <p>
-                    Station: <strong>{{ stationId }} {{ stationName }}</strong>
-                </p>
-                <p>
-                    Observeret: <strong>{{ observedTime }}</strong>
-                </p>
-            </div>
-        </div>
-
-        <br> <br>
+        <div>{{ calculateNoiseScore(latestNoise) }}</div>
+        <div>{{ calculateTemperatureScore(latestTemperature) }}</div>
+        <div>{{ calculateHumidityScore(latestHumidity) }}</div>
+        <div>{{ calculateLightScore(latestLight) }}</div>
 
         <div class="current-data-container">
             <div 
@@ -71,7 +47,7 @@ const HomePage = {
 
                 <br>
 
-                <div class="period-selection">
+                <div class="period-selection align-center">
                     <button class="period-button" v-for="opt in periodOptions"
                             :key="opt.value"
                             :class="{ active: selectedPeriod === opt.value }"
@@ -98,6 +74,30 @@ const HomePage = {
         </div>
 
         <br> <br>
+
+        <div class="card white-background align-center">
+            <select v-model="selectedStationId">
+                <option v-for="(name, id) in stations" :key="id" :value="id">
+                    {{ name }}
+                </option>
+            </select>
+            <button @click="loadWeather">Hent vejr</button>
+            <div v-if="loading">Loading weather...</div>
+            <div v-else-if="error">Error: {{ error }}</div>
+            <div v-else>
+                <div class="weather-emoji">{{ weatherEmoji }}</div>
+                <p>
+                    Temperatur: <strong>{{ temperature }}°C {{ weatherEmoji }}</strong>
+                </p>   
+                <p>
+                    Luftfugtighed: <strong>{{ humidity }}%</strong>
+                </p>
+                <p>
+                    Seneste observation: <strong>{{ formattedObservedTime }}</strong>
+                </p>
+            </div>
+        </div>
+
     </div>
     `,
     name: "DashboardPage",
@@ -317,6 +317,65 @@ const HomePage = {
             finally {
                 this.loading = false;
             }
+        },
+        calculateNoiseScore(noise) {
+            // lyd
+            if (noise.decibel <= 60) {
+                score = 100.0;
+            } else if (noise.decibel >= 75) {
+                score = 0.0;
+            } else {
+                score = 100.0 * (75.0 - noise.decibel) / (75.0 - 60.0);
+            }
+
+            return score;
+        },
+        calculateTemperatureScore(temperature) {
+            // temperatur
+            if (temperature.celsius <= 17) {
+                score = 0.0;
+            } else if (temperature.celsius <= 21) {                     
+                score = 100.0 * (temperature.celsius - 17.0) / (21.0 - 17.0);
+            } else if (temperature.celsius < 28) {                          
+                score = 100.0 * (28.0 - temperature.celsius) / (28.0 - 21.0);
+            } else {
+                score = 0.0;
+            }
+
+            return score;
+        },
+        calculateHumidityScore(humidity) {
+            // fugtighed
+            if (humidity.percent <= 0) {
+                score = 50.0;                        
+            } else if (humidity.percent <= 12.5) {
+                score = 50.0 + 4.0 * humidity.percent;             
+            } else if (humidity.percent < 45) {    
+                score = (40.0/13.0) * (45.0 - humidity.percent);    
+            } else {
+                score = 0.0;
+            }
+
+            return score;
+        },
+        calculateLightScore(light) {
+            // lys
+            if (light.lux <= 200) {
+                score = 0.0;
+            } else if (light.lux <= 5000) {    
+                score = 100.0 * (light.lux - 200.0) / (5000.0 - 200.0);
+            } else if (light.lux < 10000) {    
+                score = 100.0 * (10000.0 - light.lux) / (10000.0 - 5000.0);
+            } else {
+                score = 0.0;
+            }
+
+            return score;
+        },
+        calculateTotalScore(noise, temperature, humidity, light) {
+
+
+            return score;
         }
     },
     computed: {
@@ -338,13 +397,26 @@ const HomePage = {
         },
 
         weatherEmoji() {
-        if (this.temperature < 10) {
+            if (this.temperature < 10) {
                 return "☁️";
             } else if (this.temperature >= 10 && this.temperature <= 15) {
                 return "⛅";
             } else {
                 return "☀️";
             }
+        },
+
+        formattedObservedTime() {
+            if (!this.observedTime) return "";
+            const date = new Date(this.observedTime);
+
+            return date.toLocaleString("da-DK", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+            });
         },
     }
 }

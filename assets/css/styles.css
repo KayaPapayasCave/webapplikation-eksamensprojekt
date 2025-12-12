@@ -40,6 +40,9 @@ html {
 .white-background {
     background-color: white;
 }
+.green-background {
+    background-color: #AEC3B0;
+}
 
 .site-title {
     text-align: center;
@@ -165,4 +168,8 @@ button {
   padding: 0.25rem 0.5rem;
   cursor: pointer;
   font-size: 14px;
+}
+
+.align-center {
+  text-align: center;
 }

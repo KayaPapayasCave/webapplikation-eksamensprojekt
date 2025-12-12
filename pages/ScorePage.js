@@ -1,6 +1,5 @@
-const MeasurementPage = {
+const ScorePage = {
     components: {
-
         'measurements-table': MeasurementsTableComponent
     },
     template: /*html*/`

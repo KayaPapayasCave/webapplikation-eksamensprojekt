@@ -6,7 +6,7 @@ const apiUri = "https://localhost:7080/api/LightDB"
 
 const routes = [
     { name: 'home', path: '/', component: HomePage },
-    { name: 'measurement', path: '/', component: MeasurementPage },
+    { name: 'score', path: '/', component: ScorePage },
 ]
 
 // Make the router work:

@@ -35,7 +35,7 @@ const MeasurementPage = {
                 <i :class="card.iconClass"></i>
                 <p class="label">{{ card.label }}</p>
                 <p class="value">
-                    {{ card.healthyScore }}
+                    {{ card.healthyScore }} {{ card.unit }}
                 </p>
                 <p class="sub">Sundhedsscore</p>
             </div>
